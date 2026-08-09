@@ -3,240 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eco-Clicker: Gerador de Energia</title>
+    <title>EcoManager: Cidade do Futuro</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        
+        .game-container { background-color: #1e293b; border: 2px solid #334155; border-radius: 16px; max-width: 480px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #4ade80; text-align: center; font-size: 22px; }
+        .subtitle { color: #94a3b8; text-align: center; font-size: 12px; margin-bottom: 15px; }
+        
+        /* Dashboard Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .stat-card { background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-val { font-size: 16px; font-weight: bold; margin-top: 2px; }
+        .stat-label { font-size: 10px; color: #94a3b8; }
+        
+        /* Abas Navegação */
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 8px; background: #334155; border: none; color: #94a3b8; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .tab-btn.active { background: #10b981; color: white; }
+        
+        /* Conteúdos das Abas */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Quiz */
+        .quiz-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
+        .quiz-q { font-size: 13px; font-weight: bold; margin-bottom: 10px; min-height: 36px; }
+        .opt-btn { width: 100%; text-align: left; padding: 10px; background: #334155; border: 1px solid #475569; color: white; border-radius: 6px; margin-bottom: 6px; font-size: 12px; cursor: pointer; }
+        .opt-btn:hover { background: #475569; }
+        .feedback { font-size: 11px; padding: 8px; border-radius: 6px; margin-top: 8px; text-align: center; font-weight: bold; display: none; }
 
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .game-card {
-            background-color: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        h1 {
-            color: #4ade80;
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stats-box {
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .energy-count {
-            font-size: 32px;
-            font-weight: bold;
-            color: #38bdf8;
-        }
-
-        .energy-per-sec {
-            font-size: 13px;
-            color: #a7f3d0;
-            margin-top: 4px;
-        }
-
-        .click-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            width: 120px;
-            height: 120px;
-            border-radius: 60px;
-            font-size: 48px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
-            box-shadow: 0 6px 0 #047857;
-            user-select: none;
-            margin: 10px auto 24px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .click-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #047857;
-        }
-
-        .upgrades-title {
-            text-align: left;
-            font-size: 14px;
-            color: #cbd5e1;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 6px;
-        }
-
-        .upgrade-btn {
-            background-color: #334155;
-            border: 1px solid #475569;
-            color: white;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            transition: background-color 0.2s;
-        }
-
-        .upgrade-btn:hover:not(:disabled) {
-            background-color: #475569;
-        }
-
-        .upgrade-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .upgrade-info {
-            text-align: left;
-        }
-
-        .upgrade-name {
-            font-weight: bold;
-            display: block;
-        }
-
-        .upgrade-desc {
-            font-size: 11px;
-            color: #94a3b8;
-        }
-
-        .upgrade-cost {
-            font-weight: bold;
-            color: #facc15;
-        }
+        /* Cidade / Loja */
+        .shop-item { background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .shop-info h4 { font-size: 13px; color: #38bdf8; }
+        .shop-info p { font-size: 10px; color: #94a3b8; }
+        .buy-btn { background: #10b981; border: none; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="game-card">
-        <h1>⚡ Eco-Clicker</h1>
-        <p class="subtitle">Gere energia limpa para a cidade!</p>
+<div class="game-container">
+    <h1>🏙️ EcoManager</h1>
+    <p class="subtitle">Gerencie recursos e construa uma cidade verde!</p>
 
-        <div class="stats-box">
-            <div id="energy-display" class="energy-count">0 kWh</div>
-            <div id="rate-display" class="energy-per-sec">+0 kWh por segundo</div>
+    <!-- Painel de Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Orçamento</div>
+            <div id="ui-money" class="stat-val" style="color:#facc15">$500</div>
         </div>
-
-        <button id="click-button" class="click-btn">☀️</button>
-
-        <div class="upgrades-title">Melhorias Automáticas</div>
-
-        <button id="upg1" class="upgrade-btn" onclick="buyUpgrade(1)">
-            <div class="upgrade-info">
-                <span class="upgrade-name">Painel Solar (Qtd: <span id="count1">0</span>)</span>
-                <span class="upgrade-desc">+1 kWh/s</span>
-            </div>
-            <span id="cost1" class="upgrade-cost">15 kWh</span>
-        </button>
-
-        <button id="upg2" class="upgrade-btn" onclick="buyUpgrade(2)">
-            <div class="upgrade-info">
-                <span class="upgrade-name">Turbina Eólica (Qtd: <span id="count2">0</span>)</span>
-                <span class="upgrade-desc">+5 kWh/s</span>
-            </div>
-            <span id="cost2" class="upgrade-cost">100 kWh</span>
-        </button>
-
-        <button id="upg3" class="upgrade-btn" onclick="buyUpgrade(3)">
-            <div class="upgrade-info">
-                <span class="upgrade-name">Usina Geotérmica (Qtd: <span id="count3">0</span>)</span>
-                <span class="upgrade-desc">+20 kWh/s</span>
-            </div>
-            <span id="cost3" class="upgrade-cost">500 kWh</span>
-        </button>
+        <div class="stat-card">
+            <div class="stat-label">Energia Limpa</div>
+            <div id="ui-eco" class="stat-val" style="color:#38bdf8">0%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Aprovação</div>
+            <div id="ui-happy" class="stat-val" style="color:#4ade80">50%</div>
+        </div>
     </div>
 
-    <script>
-        // ESTADO DO JOGO
-        let energy = 0;
-        let energyPerSecond = 0;
+    <!-- Abas -->
+    <div class="nav-tabs">
+        <button id="tab-quiz-btn" class="tab-btn active" onclick="switchTab('quiz')">📋 Quiz Eco</button>
+        <button id="tab-city-btn" class="tab-btn" onclick="switchTab('city')">🏗️ Construir</button>
+    </div>
 
-        const upgrades = {
-            1: { count: 0, cost: 15, power: 1 },
-            2: { count: 0, cost: 100, power: 5 },
-            3: { count: 0, cost: 500, power: 20 }
-        };
+    <!-- Conteúdo 1: Quiz -->
+    <div id="tab-quiz" class="tab-content active">
+        <div class="quiz-box">
+            <div id="q-text" class="quiz-q">Carregando...</div>
+            <div id="q-options"></div>
+            <div id="q-feedback" class="feedback"></div>
+        </div>
+    </div>
 
-        // ELEMENTOS DA TELA
-        const energyDisplay = document.getElementById('energy-display');
-        const rateDisplay = document.getElementById('rate-display');
-        const clickBtn = document.getElementById('click-button');
+    <!-- Conteúdo 2: Construção da Cidade -->
+    <div id="tab-city" class="tab-content">
+        <div id="shop-list"></div>
+    </div>
+</div>
 
-        // CLIQUE MANUAL
-        clickBtn.addEventListener('click', () => {
-            energy += 1;
-            updateUI();
+<script>
+    // ESTADO DO JOGO
+    let money = 500;
+    let ecoPower = 0;
+    let happiness = 50;
+    let currentQ = 0;
+
+    // BANCO DE PERGUNTAS
+    const questions = [
+        { q: "Qual fonte de energia não emite gases estufa?", opts: ["Carvão", "Energia Solar", "Gás Natural"], ans: 1, reward: 200 },
+        { q: "O que significa 'Standby' nos aparelhos?", opts: ["Modo de economia total", "Consumo passivo de energia", "Aparelho desligado da tomada"], ans: 1, reward: 150 },
+        { q: "Qual o destino ideal para o óleo de cozinha usado?", opts: ["Pia da cozinha", "Lixo comum", "Postos de reciclagem"], ans: 2, reward: 200 },
+        { q: "Qual o benefício das lâmpadas LED?", opts: ["Gastam 80% menos energia", "Iluminam menos", "Duram o mesmo que as comuns"], ans: 0, reward: 180 }
+    ];
+
+    // MELHORIAS DA CIDADE
+    const buildings = [
+        { id: 1, name: "Painéis Solares", desc: "+15% Energia Limpa", cost: 300, eco: 15, happy: 5, bought: 0 },
+        { id: 2, name: "Parque Eólico", desc: "+30% Energia Limpa, +10% Aprovação", cost: 700, eco: 30, happy: 10, bought: 0 },
+        { id: 3, name: "Frota de Autocarros Elétricos", desc: "+20% Aprovação Popular", cost: 500, eco: 10, happy: 20, bought: 0 }
+    ];
+
+    // ATUALIZAR INTERFACE (UI)
+    function updateUI() {
+        document.getElementById('ui-money').innerText = '$' + money;
+        document.getElementById('ui-eco').innerText = ecoPower + '%';
+        document.getElementById('ui-happy').innerText = happiness + '%';
+        renderShop();
+    }
+
+    // ALTERNAR ABAS
+    function switchTab(tab) {
+        document.getElementById('tab-quiz').classList.remove('active');
+        document.getElementById('tab-city').classList.remove('active');
+        document.getElementById('tab-quiz-btn').classList.remove('active');
+        document.getElementById('tab-city-btn').classList.remove('active');
+
+        if (tab === 'quiz') {
+            document.getElementById('tab-quiz').classList.add('active');
+            document.getElementById('tab-quiz-btn').classList.add('active');
+        } else {
+            document.getElementById('tab-city').classList.add('active');
+            document.getElementById('tab-city-btn').classList.add('active');
+        }
+    }
+
+    // CARREGAR PERGUNTA
+    function renderQuiz() {
+        const q = questions[currentQ];
+        document.getElementById('q-text').innerText = (currentQ + 1) + ". " + q.q;
+        const optsDiv = document.getElementById('q-options');
+        optsDiv.innerHTML = "";
+
+        q.opts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => answerQuiz(idx);
+            optsDiv.appendChild(btn);
         });
+    }
 
-        // COMPRAR MELHORIA
-        function buyUpgrade(id) {
-            const upg = upgrades[id];
-            if (energy >= upg.cost) {
-                energy -= upg.cost;
-                upg.count += 1;
-                energyPerSecond += upg.power;
-                upg.cost = Math.floor(upg.cost * 1.5);
-                updateUI();
-            }
+    // RESPONDER PERGUNTA
+    function answerQuiz(idx) {
+        const q = questions[currentQ];
+        const fb = document.getElementById('q-feedback');
+        fb.style.display = 'block';
+
+        if (idx === q.ans) {
+            money += q.reward;
+            happiness = Math.min(100, happiness + 2);
+            fb.style.background = 'rgba(16, 185, 129, 0.2)';
+            fb.style.color = '#34d399';
+            fb.innerText = "Correcto! Ganhou +$" + q.reward + " e +2% de Aprovação!";
+        } else {
+            happiness = Math.max(0, happiness - 5);
+            fb.style.background = 'rgba(239, 68, 68, 0.2)';
+            fb.style.color = '#f87171';
+            fb.innerText = "Incorreto! A resposta certa era: " + q.opts[q.ans];
         }
 
-        // ATUALIZAR INTERFACE
-        function updateUI() {
-            energyDisplay.innerText = Math.floor(energy) + " kWh";
-            rateDisplay.innerText = "+" + energyPerSecond + " kWh por segundo";
-
-            for (let id in upgrades) {
-                const upg = upgrades[id];
-                document.getElementById('count' + id).innerText = upg.count;
-                document.getElementById('cost' + id).innerText = upg.cost + " kWh";
-                document.getElementById('upg' + id).disabled = energy < upg.cost;
-            }
-        }
-
-        // LOOP AUTOMÁTICO (a cada 1 segundo)
-        setInterval(() => {
-            energy += energyPerSecond;
-            updateUI();
-        }, 1000);
-
-        // Inicializar a tela
         updateUI();
-    </script>
+
+        // Passa para a próxima pergunta em ciclo continuo
+        currentQ = (currentQ + 1) % questions.length;
+        
+        // Aguarda 1.5s antes de mudar a pergunta na tela
+        setTimeout(() => {
+            fb.style.display = 'none';
+            renderQuiz();
+        }, 1500);
+    }
+
+    // LOJA / CONSTRUÇÃO
+    function renderShop() {
+        const list = document.getElementById('shop-list');
+        list.innerHTML = "";
+
+        buildings.forEach((b) => {
+            const item = document.createElement('div');
+            item.className = 'shop-item';
+            item.innerHTML = `
+                <div class="shop-info">
+                    <h4>${b.name} (${b.bought})</h4>
+                    <p>${b.desc}</p>
+                </div>
+                <button class="buy-btn" ${money < b.cost ? 'disabled' : ''} onclick="buyBuilding(${b.id})">
+                    $${b.cost}
+                </button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    // COMPRAR INFRAESTRUTURA
+    function buyBuilding(id) {
+        const b = buildings.find(x => x.id === id);
+        if (b && money >= b.cost) {
+            money -= b.cost;
+            b.bought += 1;
+            ecoPower = Math.min(100, ecoPower + b.eco);
+            happiness = Math.min(100, happiness + b.happy);
+            b.cost = Math.floor(b.cost * 1.3); // Aumenta o valor
+            updateUI();
+        }
+    }
+
+    // INICIALIZAR
+    updateUI();
+    renderQuiz();
+</script>
 </body>
 </html>
