@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoManager: Cidade Eficiente</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        .pulse-warning {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-2 sm:p-4">
+
+    <!-- Contentor Principal -->
+    <div class="max-w-5xl mx-auto w-full flex-grow flex flex-col justify-between">
+        
+        <!-- Cabeçalho / Estatísticas -->
+        <header class="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-xl p-4 mb-4 shadow-lg">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-leaf"></i> EcoManager
+                    </h1>
+                    <p class="text-xs text-slate-400">Gestão Sustentável de Energia Urbana</p>
+                </div>
+
+                <!-- Indicadores Rápidos -->
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <!-- Orçamento -->
+                    <div class="bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-coins text-amber-400 text-lg"></i>
+                        <div>
+                            <div class="text-xs text-slate-400">Orçamento</div>
+                            <div id="money-display" class="font-bold text-amber-400">1000 €</div>
+                        </div>
+                    </div>
+
+                    <!-- Poupança de CO2 -->
+                    <div class="bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-smog text-emerald-400 text-lg"></i>
+                        <div>
+                            <div class="text-xs text-slate-400">Redução de CO₂</div>
+                            <div id="co2-display" class="font-bold text-emerald-400">0 kg/s</div>
+                        </div>
+                    </div>
+
+                    <!-- Tempo/Pontuação -->
+                    <div class="bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-indigo-400 text-lg"></i>
+                        <div>
+                            <div class="text-xs text-slate-400">Pontuação</div>
+                            <div id="score-display" class="font-bold text-indigo-400">0 pts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barras de Estado -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <!-- Procura de Energia -->
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span class="text-slate-300"><i class="fa-solid fa-bolt text-yellow-400 mr-1"></i> Carga da Rede Elétrica</span>
+                        <span id="load-text" class="text-yellow-400">50%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden">
+                        <div id="load-bar" class="bg-yellow-400 h-full progress-bar" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <!-- Satisfação da População -->
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span class="text-slate-300"><i class="fa-solid fa-face-smile text-cyan-400 mr-1"></i> Satisfação Pública</span>
+                        <span id="satisfaction-text" class="text-cyan-400">100%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden">
+                        <div id="satisfaction-bar" class="bg-cyan-400 h-full progress-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Área Central do Jogo -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-grow mb-4">
+
+            <!-- Painel da Cidade (Visualização e Ações) -->
+            <div class="lg:col-span-2 bg-slate-800/80 border border-slate-700 rounded-xl p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-slate-200">
+                            <i class="fa-solid fa-city text-indigo-400 mr-2"></i> Setores da Cidade
+                        </h2>
+                        <span class="text-xs text-slate-400">Melhore os setores para reduzir a carga elétrica</span>
+                    </div>
+
+                    <!-- Grelha de Setores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="sectors-grid">
+                        <!-- Gerado por JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Evento Estocástico / Alerta -->
+                <div id="event-box" class="mt-4 p-3 bg-slate-900/80 border border-slate-700 rounded-lg hidden flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i id="event-icon" class="fa-solid fa-triangle-exclamation text-amber-400 text-xl"></i>
+                        <div>
+                            <div id="event-title" class="text-sm font-bold text-slate-200">Evento de Pico de Consumo!</div>
+                            <div id="event-desc" class="text-xs text-slate-400">Uma onda de calor aumentou a procura de ar condicionado.</div>
+                        </div>
+                    </div>
+                    <button id="event-action" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded transition">
+                        Resolver (-50 €)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Painel de Dicas de Eficiência e Quiz -->
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200 mb-3">
+                        <i class="fa-solid fa-lightbulb text-amber-400 mr-2"></i> Desafio de Conhecimento
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-4">
+                        Responda corretamente a questões sobre eficiência energética para ganhar subsídios e financiar melhorias na cidade!
+                    </p>
+
+                    <!-- Cartão de Pergunta -->
+                    <div id="quiz-card" class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                        <div id="quiz-question" class="text-sm font-medium text-slate-100 mb-3">
+                            A carregar pergunta...
+                        </div>
+                        <div id="quiz-options" class="space-y-2">
+                            <!-- Gerado por JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conselho de Eficiência -->
+                <div class="mt-4 p-3 bg-emerald-950/40 border border-emerald-800/50 rounded-lg">
+                    <div class="text-xs text-emerald-400 font-semibold mb-1">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Sabias que?
+                    </div>
+                    <div id="eco-tip" class="text-xs text-slate-300">
+                        A iluminação LED consome até 80% menos energia do que as lâmpadas incandescentes tradicionais.
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Rodapé -->
+        <footer class="text-center text-xs text-slate-500 py-2">
+            EcoManager &copy; 2026 - Aprenda a poupar energia para um futuro sustentável.
+        </footer>
+    </div>
+
+    <!-- Modal de Fim de Jogo -->
+    <div id="game-over-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl max-w-md w-full text-center shadow-2xl">
+            <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-plug-circle-xmark"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-100 mb-2">Blackout Geral!</h2>
+            <p class="text-sm text-slate-300 mb-4">
+                A procura de energia ultrapassou a capacidade da rede elétrica e a cidade ficou às escuras.
+            </p>
+            <div class="bg-slate-900 p-3 rounded-lg mb-4 text-left text-xs space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Pontuação Final:</span>
+                    <span id="final-score" class="font-bold text-amber-400">0 pts</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">CO₂ Poupado:</span>
+                    <span id="final-co2" class="font-bold text-emerald-400">0 kg</span>
+                </div>
+            </div>
+            <button onclick="resetGame()" class="w-full py-2 px-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-lg transition">
+                Tentar Novamente
+            </button>
+        </div>
+    </div>
+
+    <!-- Lógica do Jogo -->
+    <script>
+        // --- ESTADO DO JOGO ---
+        let money = 1200;
+        let score = 0;
+        let co2SavedTotal = 0;
+        let currentLoad = 65; // Carga em %
+        let satisfaction = 100; // Satisfação em %
+        let gameActive = true;
+
+        // Dicas educativas
+        const tips = [
+            "A iluminação LED consome até 80% menos energia do que as lâmpadas incandescentes tradicionais.",
+            "Desligar aparelhos no modo standby pode poupar até 10% no valor da fatura de eletricidade.",
+            "Janelas com vidro duplo reduzem drasticamente as perdas de calor nas habitações.",
+            "Eletrodomésticos com classe de eficiência A+++ consomem metade da energia de modelos antigos.",
+            "A iluminação inteligente com sensores de presença evita o desperdício em zonas públicas e escritórios."
+        ];
+
+        // Setores da Cidade
+        const sectors = [
+            {
+                id: 'residential',
+                name: 'Bairro Residencial',
+                icon: 'fa-house-user',
+                level: 1,
+                maxLevel: 4,
+                baseCost: 300,
+                baseEfficiency: 15, // Carga reduzida por nível
+                description: 'Isolamento térmico e lâmpadas LED.',
+                techName: ['Sem isolamento', 'Lâmpadas LED', 'Janelas Eficientes', 'Eletrodomésticos A+++']
+            },
+            {
+                id: 'public-light',
+                name: 'Iluminação Pública',
+                icon: 'fa-lightbulb',
+                level: 1,
+                maxLevel: 4,
+                baseCost: 200,
+                baseEfficiency: 10,
+                description: 'Luminárias inteligentes e painéis solares.',
+                techName: ['Lâmpadas de Vapor de Sódio', 'Luminárias LED', 'Sensores de Presença', 'Rede Solar Autónoma']
+            },
+            {
+                id: 'commercial',
+                name: 'Centro Comercial',
+                icon: 'fa-building',
+                level: 1,
+                maxLevel: 4,
+                baseCost: 500,
+                baseEfficiency: 25,
+                description: 'Sistemas AVAC e gestão energética.',
+                techName: ['Climatização Antiga', 'AVAC Inverter', 'Gestão Inteligente (BMS)', 'Fachada Fotovoltaica']
+            },
+            {
+                id: 'industry',
+                name: 'Zona Industrial',
+                icon: 'fa-industry',
+                level: 1,
+                maxLevel: 4,
+                baseCost: 800,
+                baseEfficiency: 35,
+                description: 'Motores de alta eficiência e auditoria.',
+                techName: ['Motores Convencionais', 'Variadores de Velocidade', 'Recuperação de Calor', 'Auditoria Zero Emissões']
+            }
+        ];
+
+        // Quiz de Eficiência Energética
+        const questions = [
+            {
+                question: "Qual destas ações ajuda a reduzir o consumo de energia em casa?",
+                options: [
+                    "Manter os aparelhos em modo de espera (standby)",
+                    "Aproveitar a luz natural durante o dia",
+                    "Ajustar o ar condicionado para temperaturas muito baixas",
+                    "Usar a máquina de lavar roupa com pouca carga"
+                ],
+                correct: 1,
+                reward: 200
+            },
+            {
+                question: "O que significa a etiqueta de eficiência energética num eletrodoméstico?",
+                options: [
+                    "A velocidade máxima do aparelho",
+                    "O tempo de garantia concedido pelo fabricante",
+                    "O nível de consumo elétrico do equipamento",
+                    "O custo total de manutenção anual"
+                ],
+                correct: 2,
+                reward: 250
+            },
+            {
+                question: "Qual é o principal benefício da utilização de iluminação LED?",
+                options: [
+                    "Durabilidade menor e menor brilho",
+                    "Maior consumo com luz mais quente",
+                    "Elevada eficiência energética e maior vida útil",
+                    "Aumento significativo do aquecimento das lâmpadas"
+                ],
+                correct: 2,
+                reward: 200
+            },
+            {
+                question: "Qual é a temperatura ideal recomendada para o termóstato do aquecimento no inverno?",
+                options: [
+                    "25°C a 28°C",
+                    "19°C a 21°C",
+                    "12°C a 15°C",
+                    "30°C"
+                ],
+                correct: 1,
+                reward: 300
+            },
+            {
+                question: "O que é o autoconsumo fotovoltaico?",
+                options: [
+                    "Produção de eletricidade através do sol para consumo próprio",
+                    "Comprar energia unicamente de fontes fósseis",
+                    "Utilização de geradores a gasóleo para consumo doméstico",
+                    "Armazenar eletricidade sem utilização prática"
+                ],
+                correct: 0,
+                reward: 300
+            }
+        ];
+
+        let currentQuizIndex = 0;
+
+        // --- INICIALIZAÇÃO DO JOGO ---
+        function initGame() {
+            renderSectors();
+            loadQuiz();
+            startLoop();
+            updateDashboard();
+        }
+
+        // Renderizar Setores
+        function renderSectors() {
+            const grid = document.getElementById('sectors-grid');
+            grid.innerHTML = '';
+
+            sectors.forEach(sector => {
+                const isMax = sector.level >= sector.maxLevel;
+                const upgradeCost = sector.baseCost * sector.level;
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/70 border border-slate-700/80 rounded-lg p-3 flex flex-col justify-between hover:border-slate-500 transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-sm text-slate-200 flex items-center gap-2">
+                                <i class="fa-solid ${sector.icon} text-indigo-400"></i> ${sector.name}
+                            </span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-800">
+                                Nível ${sector.level}/${sector.maxLevel}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-1">${sector.description}</p>
+                        <div class="text-xs text-emerald-400 mb-3 font-medium">
+                            <i class="fa-solid fa-microchip mr-1"></i> ${sector.techName[sector.level - 1]}
+                        </div>
+                    </div>
+                    <button onclick="upgradeSector('${sector.id}')" ${isMax ? 'disabled' : ''} 
+                        class="w-full py-1.5 px-3 ${isMax ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500 text-slate-950'} font-bold text-xs rounded transition flex justify-between items-center">
+                        <span>${isMax ? 'Melhoria Máxima' : 'Melhorar'}</span>
+                        <span>${isMax ? '' : upgradeCost + ' €'}</span>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Melhorar Setor
+        function upgradeSector(id) {
+            if (!gameActive) return;
+
+            const sector = sectors.find(s => s.id === id);
+            const cost = sector.baseCost * sector.level;
+
+            if (money >= cost && sector.level < sector.maxLevel) {
+                money -= cost;
+                sector.level += 1;
+                
+                // Reduzir carga e aumentar pontuação
+                currentLoad = Math.max(10, currentLoad - sector.baseEfficiency);
+                score += 150;
+                co2SavedTotal += sector.baseEfficiency * 12;
+
+                // Atualizar Dica Aleatória
+                document.getElementById('eco-tip').innerText = tips[Math.floor(Math.random() * tips.length)];
+
+                renderSectors();
+                updateDashboard();
+            }
+        }
+
+        // Carregar Quiz
+        function loadQuiz() {
+            const q = questions[currentQuizIndex];
+            document.getElementById('quiz-question').innerText = q.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2";
+                btn.innerHTML = `<span class="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold">${index + 1}</span> ${opt}`;
+                btn.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Verificar Resposta do Quiz
+        function checkAnswer(selectedIndex) {
+            if (!gameActive) return;
+
+            const q = questions[currentQuizIndex];
+            if (selectedIndex === q.correct) {
+                money += q.reward;
+                score += 100;
