@@ -144,21 +144,21 @@
                     </p>
 
                     <!-- Cartão de Pergunta -->
-                    <div id="quiz-card" class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+<div id="quiz-card" class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
     <div id="quiz-question" class="text-sm font-medium text-slate-100 mb-3">
         Qual destas ações ajuda a reduzir o consumo de energia em casa?
     </div>
     <div id="quiz-options" class="space-y-2">
-        <button onclick="checkAnswer(0)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+        <button onclick="if(typeof checkAnswer === 'function') checkAnswer(0)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
             <span class="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold">1</span> Manter os aparelhos em modo de espera (standby)
         </button>
-        <button onclick="checkAnswer(1)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+        <button onclick="if(typeof checkAnswer === 'function') checkAnswer(1)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
             <span class="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold">2</span> Aproveitar a luz natural durante o dia
         </button>
-        <button onclick="checkAnswer(2)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+        <button onclick="if(typeof checkAnswer === 'function') checkAnswer(2)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
             <span class="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold">3</span> Ajustar o ar condicionado para temperaturas muito baixas
         </button>
-        <button onclick="checkAnswer(3)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+        <button onclick="if(typeof checkAnswer === 'function') checkAnswer(3)" class="w-full text-left text-xs p-2.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
             <span class="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold">4</span> Usar a máquina de lavar roupa com pouca carga
         </button>
     </div>
