@@ -422,9 +422,7 @@
         }
 
         // Verificar Resposta do Quiz
-        function checkAnswer(selectedIndex) {
-            if (!gameActive) return;
-
+         function checkAnswer(selectedIndex) {
             const q = questions[currentQuizIndex];
             if (selectedIndex === q.correct) {
                 money += q.reward;
