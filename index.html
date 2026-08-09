@@ -3,154 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoManager: Cidade Eficiente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Eco-Clicker: Gerador de Energia</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-card {
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            color: #4ade80;
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stats-box {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .energy-count {
+            font-size: 32px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .energy-per-sec {
+            font-size: 13px;
+            color: #a7f3d0;
+            margin-top: 4px;
+        }
+
+        .click-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            font-size: 48px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 6px 0 #047857;
+            user-select: none;
+            margin: 10px auto 24px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .click-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #047857;
+        }
+
+        .upgrades-title {
+            text-align: left;
+            font-size: 14px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 6px;
+        }
+
+        .upgrade-btn {
+            background-color: #334155;
+            border: 1px solid #475569;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .upgrade-btn:hover:not(:disabled) {
+            background-color: #475569;
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-info {
+            text-align: left;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            display: block;
+        }
+
+        .upgrade-desc {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .upgrade-cost {
+            font-weight: bold;
+            color: #facc15;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+<body>
 
-    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-2xl space-y-6">
-        
-        <!-- Cabeçalho -->
-        <div class="text-center border-b border-slate-800 pb-4">
-            <h1 class="text-2xl font-bold text-emerald-400">🍃 EcoManager</h1>
-            <p class="text-xs text-slate-400">Gestão e Eficiência Energética</p>
+    <div class="game-card">
+        <h1>⚡ Eco-Clicker</h1>
+        <p class="subtitle">Gere energia limpa para a cidade!</p>
+
+        <div class="stats-box">
+            <div id="energy-display" class="energy-count">0 kWh</div>
+            <div id="rate-display" class="energy-per-sec">+0 kWh por segundo</div>
         </div>
 
-        <!-- Painel de Recursos (Consequências) -->
-        <div class="grid grid-cols-2 gap-3 text-center">
-            <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
-                <span class="text-xs text-slate-400 block">Orçamento</span>
-                <span id="ui-money" class="text-lg font-bold text-emerald-400">$1200</span>
-            </div>
-            <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
-                <span class="text-xs text-slate-400 block">Pontuação</span>
-                <span id="ui-score" class="text-lg font-bold text-cyan-400">0</span>
-            </div>
-        </div>
+        <button id="click-button" class="click-btn">☀️</button>
 
-        <!-- Caixa de Mensagem de Feedback -->
-        <div id="ui-feedback" class="hidden text-center text-xs p-2.5 rounded font-medium transition-all"></div>
+        <div class="upgrades-title">Melhorias Automáticas</div>
 
-        <!-- Card do Quiz -->
-        <div class="bg-slate-800/40 p-4 rounded-lg border border-slate-700/60 space-y-4">
-            <div id="quiz-question" class="text-sm font-semibold text-slate-100 min-h-[40px] flex items-center">
-                <!-- A pergunta será inserida aqui via JS -->
+        <button id="upg1" class="upgrade-btn" onclick="buyUpgrade(1)">
+            <div class="upgrade-info">
+                <span class="upgrade-name">Painel Solar (Qtd: <span id="count1">0</span>)</span>
+                <span class="upgrade-desc">+1 kWh/s</span>
             </div>
-            
-            <div id="quiz-options" class="space-y-2">
-                <!-- As opções serão inseridas aqui via JS -->
-            </div>
-        </div>
+            <span id="cost1" class="upgrade-cost">15 kWh</span>
+        </button>
 
-        <!-- Rodapé -->
-        <div class="text-center text-[10px] text-slate-500 border-t border-slate-800 pt-3">
-            Responda corretamente para ganhar fundos e manter a cidade no ar!
-        </div>
+        <button id="upg2" class="upgrade-btn" onclick="buyUpgrade(2)">
+            <div class="upgrade-info">
+                <span class="upgrade-name">Turbina Eólica (Qtd: <span id="count2">0</span>)</span>
+                <span class="upgrade-desc">+5 kWh/s</span>
+            </div>
+            <span id="cost2" class="upgrade-cost">100 kWh</span>
+        </button>
+
+        <button id="upg3" class="upgrade-btn" onclick="buyUpgrade(3)">
+            <div class="upgrade-info">
+                <span class="upgrade-name">Usina Geotérmica (Qtd: <span id="count3">0</span>)</span>
+                <span class="upgrade-desc">+20 kWh/s</span>
+            </div>
+            <span id="cost3" class="upgrade-cost">500 kWh</span>
+        </button>
     </div>
 
     <script>
-        // --- ESTADO DO JOGO ---
-        let money = 1200;
-        let score = 0;
-        let currentQuizIndex = 0;
-        let gameActive = true;
+        // ESTADO DO JOGO
+        let energy = 0;
+        let energyPerSecond = 0;
 
-        // --- BANCO DE DADOS DE PERGUNTAS ---
-        const questions = [
-            {
-                question: "Qual destas ações ajuda a reduzir o consumo de energia em casa?",
-                options: [
-                    "Manter os aparelhos em modo de espera (standby)",
-                    "Aproveitar a luz natural durante o dia",
-                    "Ajustar o ar condicionado para temperaturas muito baixas",
-                    "Usar a máquina de lavar roupa com pouca carga"
-                ],
-                correct: 1,
-                reward: 200
-            },
-            {
-                question: "Qual lâmpada é mais eficiente e económica para a cidade?",
-                options: [
-                    "Lâmpada Incandescente",
-                    "Lâmpada Halogénea",
-                    "Lâmpada LED",
-                    "Lâmpada de Vapor de Sódio"
-                ],
-                correct: 2,
-                reward: 250
-            },
-            {
-                question: "Qual destas fontes é considerada limpa e renovável?",
-                options: [
-                    "Carvão mineral",
-                    "Energia Solar",
-                    "Petróleo",
-                    "Gás Natural"
-                ],
-                correct: 1,
-                reward: 300
-            }
-        ];
+        const upgrades = {
+            1: { count: 0, cost: 15, power: 1 },
+            2: { count: 0, cost: 100, power: 5 },
+            3: { count: 0, cost: 500, power: 20 }
+        };
 
-        // --- ATUALIZAR INTERFACE (UI) ---
-        function updateUI() {
-            document.getElementById("ui-money").innerText = "$" + money;
-            document.getElementById("ui-score").innerText = score;
-        }
+        // ELEMENTOS DA TELA
+        const energyDisplay = document.getElementById('energy-display');
+        const rateDisplay = document.getElementById('rate-display');
+        const clickBtn = document.getElementById('click-button');
 
-        // --- EXIBIR PERGUNTA E OPÇÕES ---
-        function renderQuiz() {
-            const q = questions[currentQuizIndex];
-            const questionEl = document.getElementById("quiz-question");
-            const optionsEl = document.getElementById("quiz-options");
-
-            questionEl.innerText = `${currentQuizIndex + 1}. ${q.question}`;
-            optionsEl.innerHTML = "";
-
-            q.options.forEach((optionText, index) => {
-                const btn = document.createElement("button");
-                btn.className = "w-full text-left text-xs p-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 transition-all flex items-center gap-3 cursor-pointer";
-                btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] font-bold shrink-0">${index + 1}</span> <span>${optionText}</span>`;
-                btn.onclick = () => checkAnswer(index);
-                optionsEl.appendChild(btn);
-            });
-        }
-
-        // --- PROCESSAR RESPOSTA E CONSEQUÊNCIAS ---
-        function checkAnswer(selectedIndex) {
-            if (!gameActive) return;
-
-            const q = questions[currentQuizIndex];
-            const feedbackEl = document.getElementById("ui-feedback");
-
-            feedbackEl.classList.remove("hidden", "bg-emerald-500/20", "text-emerald-300", "border-emerald-500/30", "bg-rose-500/20", "text-rose-300", "border-rose-500/30");
-
-            if (selectedIndex === q.correct) {
-                // Consequência Positiva
-                money += q.reward;
-                score += 100;
-                feedbackEl.innerText = `Correcto! A cidade ganhou +$${q.reward} e +100 pontos!`;
-                feedbackEl.classList.add("bg-emerald-500/20", "text-emerald-300", "border", "border-emerald-500/30");
-            } else {
-                // Consequência Negativa
-                money = Math.max(0, money - 50); // Penalização suave
-                feedbackEl.innerText = `Incorreto! Perdeu $50. A resposta certa era: "${q.options[q.correct]}"`;
-                feedbackEl.classList.add("bg-rose-500/20", "text-rose-300", "border", "border-rose-500/30");
-            }
-
-            // Atualizar os recursos no painel
+        // CLIQUE MANUAL
+        clickBtn.addEventListener('click', () => {
+            energy += 1;
             updateUI();
+        });
 
-            // Avançar para a próxima pergunta de forma contínua
-            currentQuizIndex = (currentQuizIndex + 1) % questions.length;
-
-            // Renderizar nova pergunta
-            renderQuiz();
+        // COMPRAR MELHORIA
+        function buyUpgrade(id) {
+            const upg = upgrades[id];
+            if (energy >= upg.cost) {
+                energy -= upg.cost;
+                upg.count += 1;
+                energyPerSecond += upg.power;
+                upg.cost = Math.floor(upg.cost * 1.5);
+                updateUI();
+            }
         }
 
-        // --- INICIALIZAÇÃO IMEDIATA ---
+        // ATUALIZAR INTERFACE
+        function updateUI() {
+            energyDisplay.innerText = Math.floor(energy) + " kWh";
+            rateDisplay.innerText = "+" + energyPerSecond + " kWh por segundo";
+
+            for (let id in upgrades) {
+                const upg = upgrades[id];
+                document.getElementById('count' + id).innerText = upg.count;
+                document.getElementById('cost' + id).innerText = upg.cost + " kWh";
+                document.getElementById('upg' + id).disabled = energy < upg.cost;
+            }
+        }
+
+        // LOOP AUTOMÁTICO (a cada 1 segundo)
+        setInterval(() => {
+            energy += energyPerSecond;
+            updateUI();
+        }, 1000);
+
+        // Inicializar a tela
         updateUI();
-        renderQuiz();
     </script>
 </body>
 </html>
