@@ -3,28 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoManager: Empire</title>
+    <title>EcoManager: Empire Deluxe</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: #0b0f19; color: #f1f5f9; min-height: 100vh; padding: 15px; display: flex; justify-content: center; }
         
         .app-card { background: #111827; border: 1px solid #1e293b; border-radius: 16px; max-width: 520px; width: 100%; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
-        .header { text-align: center; margin-bottom: 15px; }
-        .header h1 { font-size: 24px; color: #10b981; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 22px; color: #10b981; }
         .header p { font-size: 11px; color: #64748b; }
+
+        /* Mapa da Cidade */
+        .city-map-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: center; }
+        .city-map-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .city-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; font-size: 18px; line-height: 1.2; }
         
+        /* Mission Banner */
+        .mission-box { background: #1e1b4b; border: 1px solid #4338ca; border-radius: 10px; padding: 10px; margin-bottom: 15px; font-size: 11px; color: #c7d2fe; }
+        .mission-title { font-weight: bold; color: #818cf8; margin-bottom: 2px; }
+
         /* Stats Dashboard */
         .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .stat-box { background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; }
-        .stat-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-val { font-size: 15px; font-weight: bold; margin-top: 2px; }
+        .stat-box { background: #1e293b; border: 1px solid #334155; padding: 8px; border-radius: 10px; text-align: center; }
+        .stat-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
+        .stat-val { font-size: 14px; font-weight: bold; margin-top: 2px; }
 
         /* Status Bar */
         .status-bar-container { background: #1e293b; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 11px; border: 1px solid #334155; }
         .bar-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .progress-bg { background: #0f172a; border-radius: 4px; height: 6px; width: 100%; overflow: hidden; margin-bottom: 8px; }
         .progress-fill { height: 100%; transition: width 0.3s; }
+
+        /* Factions Bar */
+        .factions-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; font-size: 10px; background: #0f172a; padding: 8px; border-radius: 8px; border: 1px solid #334155; }
+        .faction-item { text-align: center; }
 
         /* Tabs */
         .tab-menu { display: flex; gap: 4px; margin-bottom: 15px; background: #0f172a; padding: 4px; border-radius: 8px; }
@@ -35,9 +48,9 @@
         .tab-view.active { display: block; }
 
         /* Items / Upgrades */
-        .card-item { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .card-info h4 { font-size: 13px; color: #38bdf8; }
-        .card-info p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .card-item { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .card-info h4 { font-size: 12px; color: #38bdf8; }
+        .card-info p { font-size: 10px; color: #94a3b8; margin-top: 2px; }
         .btn-action { background: #10b981; border: none; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
         .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
 
@@ -47,7 +60,8 @@
         .crisis-desc { font-size: 11px; color: #fde68a; margin-bottom: 10px; }
 
         /* Quiz UI */
-        .quiz-q { font-size: 13px; font-weight: bold; margin-bottom: 10px; }
+        .quiz-category { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #facc15; margin-bottom: 4px; font-weight: bold; }
+        .quiz-q { font-size: 12px; font-weight: bold; margin-bottom: 10px; }
         .quiz-opt { width: 100%; text-align: left; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 6px; margin-bottom: 6px; font-size: 11px; cursor: pointer; }
         .quiz-opt:hover { background: #334155; }
         .feedback { font-size: 11px; padding: 8px; border-radius: 6px; margin-top: 8px; text-align: center; font-weight: bold; display: none; }
@@ -58,20 +72,32 @@
 <div class="app-card">
     <div class="header">
         <h1>🌆 EcoManager: Empire</h1>
-        <p>Simulador Real de Gestão Urbana & Sustentabilidade</p>
+        <p>Edição Simulador Real com Eleições & Mapa Vivo</p>
+    </div>
+
+    <!-- Mapa Visual da Cidade -->
+    <div class="city-map-card">
+        <div class="city-map-title">Visualização do Distrito Urbano</div>
+        <div id="city-grid" class="city-grid"></div>
+    </div>
+
+    <!-- Missão Ativa -->
+    <div class="mission-box">
+        <div class="mission-title">🎯 Cenário Atual: Operação Transição Verde</div>
+        <div>Reduza a poluição para 0% e atinja 100% de Energia Limpa antes do Mês 24.</div>
     </div>
 
     <!-- Crise Ativa -->
     <div id="crisis-box" class="crisis-card">
         <div class="crisis-title">⚠️ CRISE URBANA EM ANDAMENTO</div>
-        <div id="crisis-text" class="crisis-desc">Uma onda de calor extrema aumentou a demanda por energia em 50%!</div>
-        <button class="btn-action" style="background:#f97316; width:100%" onclick="resolveCrisis()">Resolver Crise (Acesse o Quiz)</button>
+        <div id="crisis-text" class="crisis-desc">Uma emergência ecológica exige uma decisão rápida!</div>
+        <button class="btn-action" style="background:#f97316; width:100%" onclick="resolveCrisis()">Resolver Crise (Acesse os Desafios)</button>
     </div>
 
     <!-- Dash Stats -->
     <div class="dash-grid">
         <div class="stat-box">
-            <div class="stat-title">Cálculo Mensal</div>
+            <div class="stat-title">Tempo de Jogo</div>
             <div id="ui-date" class="stat-val" style="color:#a855f7">Mês 1</div>
         </div>
         <div class="stat-box">
@@ -84,7 +110,14 @@
         </div>
     </div>
 
-    <!-- Indicadores de Cidade -->
+    <!-- Indicadores do Conselho de Facções -->
+    <div class="factions-box">
+        <div class="faction-item">🌱 Eco: <b id="fac-eco" style="color:#4ade80">60%</b></div>
+        <div class="faction-item">💼 Empresários: <b id="fac-biz" style="color:#facc15">60%</b></div>
+        <div class="faction-item">👥 Cidadãos: <b id="fac-cit" style="color:#38bdf8">70%</b></div>
+    </div>
+
+    <!-- Indicadores Globais -->
     <div class="status-bar-container">
         <div class="bar-row">
             <span>Demanda Elétrica vs Capacidade</span>
@@ -93,16 +126,16 @@
         <div class="progress-bg"><div id="bar-energy" class="progress-fill" style="background:#38bdf8; width: 0%;"></div></div>
 
         <div class="bar-row">
-            <span>Aprovação Popular</span>
+            <span>Aprovação Geral (Eleições em Mês <span id="ui-elec-countdown">12</span>)</span>
             <span id="ui-happy-text">70%</span>
         </div>
         <div class="progress-bg"><div id="bar-happy" class="progress-fill" style="background:#4ade80; width: 70%;"></div></div>
 
         <div class="bar-row">
             <span>Nível de Poluição Urbana</span>
-            <span id="ui-pollution-text">15%</span>
+            <span id="ui-pollution-text">35%</span>
         </div>
-        <div class="progress-bg"><div id="bar-pollution" class="progress-fill" style="background:#ef4444; width: 15%;"></div></div>
+        <div class="progress-bg"><div id="bar-pollution" class="progress-fill" style="background:#ef4444; width: 35%;"></div></div>
     </div>
 
     <!-- Navegação -->
@@ -124,6 +157,7 @@
 
     <!-- TAB 3: QUIZ -->
     <div id="tab-quiz" class="tab-view">
+        <div id="q-cat" class="quiz-category">Categoria: Gestão Urbana</div>
         <div class="quiz-q" id="q-text">Carregando pergunta...</div>
         <div id="q-options"></div>
         <div id="q-feedback" class="feedback"></div>
@@ -135,44 +169,74 @@
     let month = 1;
     let money = 1000;
     let pop = 1000;
-    let happy = 70;
-    let pollution = 15;
+    let pollution = 35;
     let energyCap = 10;
     let activeCrisis = false;
     let currentQ = 0;
 
+    // FACÇÕES
+    let facEco = 60;
+    let facBiz = 60;
+    let facCit = 70;
+
     // CONSTRUÇÕES
     const buildings = [
-        { id: 1, name: "Parque Solar Comunitário", desc: "+15 MW Energia Limpa, -5% Poluição", cost: 400, cap: 15, pol: -5, bought: 0 },
-        { id: 2, name: "Usina Eólica Off-shore", desc: "+40 MW Energia Limpa, -10% Poluição", cost: 950, cap: 40, pol: -10, bought: 0 },
-        { id: 3, name: "Centro de Reciclagem Avançado", desc: "-15% Poluição, +$150/mês", cost: 600, cap: 0, pol: -15, income: 150, bought: 0 },
-        { id: 4, name: "Rede de Metrô Elétrico", desc: "+15% Aprovação, -10% Poluição", cost: 1200, cap: 0, pol: -10, happy: 15, bought: 0 }
+        { id: 1, name: "Parque Solar Comunitário", desc: "+15 MW Limpa, -5% Poluição", cost: 400, cap: 15, pol: -5, icon: '☀️', bought: 0 },
+        { id: 2, name: "Usina Eólica Off-shore", desc: "+40 MW Limpa, -10% Poluição", cost: 950, cap: 40, pol: -10, icon: '💨', bought: 0 },
+        { id: 3, name: "Centro de Reciclagem Avançado", desc: "-15% Poluição, +$150/mês", cost: 600, cap: 0, pol: -15, income: 150, icon: '♻️', bought: 0 },
+        { id: 4, name: "Rede de Metrô Elétrico", desc: "+15% Cidadãos, -10% Poluição", cost: 1200, cap: 0, pol: -10, icon: '🚆', bought: 0 }
     ];
 
-    // DECRETOS POLITICOS
+    // DECRETOS POLÍTICOS
     const policies = [
-        { id: 1, name: "Subvenção a Veículos Elétricos", desc: "-10% Poluição, Custa $50/mês", active: false, costPerMonth: 50, polEffect: -10 },
-        { id: 2, name: "Proibição de Plásticos de Uso Único", desc: "+5% Aprovação, -5% Poluição", active: false, costPerMonth: 0, polEffect: -5 },
-        { id: 3, name: "Imposto sobre Indústrias Poluentes", desc: "+$200/mês, -8% Aprovação", active: false, incomePerMonth: 200, happyEffect: -8 }
+        { id: 1, name: "Subvenção a Veículos Elétricos", desc: "-10% Poluição, +10% Eco, Custa $50/mês", active: false, costPerMonth: 50, polEffect: -10, ecoEff: 10, bizEff: -5 },
+        { id: 2, name: "Proibição de Plásticos Descartáveis", desc: "-5% Poluição, +10% Eco, -10% Empresários", active: false, costPerMonth: 0, polEffect: -5, ecoEff: 10, bizEff: -10 },
+        { id: 3, name: "Taxa sobre Indústrias Poluentes", desc: "+$200/mês, -15% Empresários, +5% Eco", active: false, incomePerMonth: 200, bizEff: -15, ecoEff: 5 }
     ];
 
-    // DESAFIOS & PERGUNTAS
+    // PERGUNTAS DE GESTÃO URBANA & CURIOSIDADES
     const questions = [
-        { q: "Sua cidade está sofrendo com ilhas de calor. Qual a melhor solução urbanística?", opts: ["Pintar o asfalto de preto", "Criar telhados verdes e plantar árvores", "Instalar mais ar-condicionados nas ruas"], ans: 1, reward: 300 },
-        { q: "Uma indústria quer se instalar na cidade prometendo empregos, mas poluindo o rio. O que fazer?", opts: ["Exigir tratamento de efluentes 100% limpo", "Aceitar sem restrições", "Proibir qualquer indústria de entrar"], ans: 0, reward: 350 },
-        { q: "Qual a melhor estratégia para lidar com o aumento do lixo eletrônico?", opts: ["Jogar no aterro comum", "Criar pontos de logística reversa e coleta seletiva", "Incinerar tudo em praça pública"], ans: 1, reward: 300 },
-        { q: "Para reduzir as emissões do transporte, qual a prioridade de investimento?", opts: ["Aumentar o número de faixas para carros", "Investir em transporte público elétrico e ciclovias", "Reduzir o preço da gasolina"], ans: 1, reward: 400 }
+        { q: "Sua cidade sofre com ilhas de calor. Qual a melhor solução urbanística?", opts: ["Pintar o asfalto de preto", "Criar telhados verdes e plantar árvores", "Instalar mais ar-condicionados"], ans: 1, reward: 300, ecoEff: 10 },
+        { q: "Uma fábrica quer instalar-se prometendo empregos, mas poluindo o rio. O que fazer?", opts: ["Exigir tratamento de efluentes 100% limpo", "Aceitar sem restrições", "Proibir qualquer indústria"], ans: 0, reward: 350, bizEff: 5, ecoEff: 5 },
+        { q: "Qual a melhor estratégia para lidar com o aumento do lixo eletrônico?", opts: ["Jogar no aterro comum", "Criar pontos de logística reversa e coleta seletiva", "Incinerar tudo"], ans: 1, reward: 300, ecoEff: 8 },
+        { q: "Para reduzir as emissões do transporte, qual a prioridade de investimento?", opts: ["Aumentar faixas para carros", "Investir em transporte público elétrico e ciclovias", "Reduzir preço da gasolina"], ans: 1, reward: 400, citEff: 10 },
+        { q: "💡 Curiosidade: Qual é o país que mais produz energia solar e eólica no mundo?", opts: ["Estados Unidos", "China", "Alemanha"], ans: 1, reward: 450, ecoEff: 5 },
+        { q: "💡 Curiosidade: Qual país utiliza a energia geotérmica aproveitando o calor dos vulcões?", opts: ["Islândia", "Japão", "Austrália"], ans: 0, reward: 450, ecoEff: 5 }
     ];
 
-    // LOOP TEMPORAL (Roda a cada 4 segundos = 1 Mês)
+    // MAPA VISUAL (Grid 6x3)
+    function renderMap() {
+        const grid = document.getElementById('city-grid');
+        grid.innerHTML = '';
+        
+        let tiles = [];
+        // Preenche com base no status da cidade
+        buildings.forEach(b => {
+            for(let i=0; i<b.bought; i++) tiles.push(b.icon);
+        });
+
+        // Preenche o restante com fábrica (se poluído) ou parque (se limpo)
+        while(tiles.length < 18) {
+            if(pollution > 20) {
+                tiles.push(Math.random() > 0.5 ? '🏭' : '🏢');
+            } else {
+                tiles.push(Math.random() > 0.5 ? '🌳' : '🏢');
+            }
+        }
+
+        tiles.slice(0, 18).forEach(icon => {
+            const span = document.createElement('span');
+            span.innerText = icon;
+            grid.appendChild(span);
+        });
+    }
+
+    // LOOP TEMPORAL (15 segundos = 1 Mês)
     setInterval(() => {
         month++;
         
-        // Crescimento populacional
         pop += Math.floor(pop * 0.02);
         let energyDemand = Math.floor(pop / 80);
-
-        // Rendimento base dos impostos
         let income = Math.floor(pop * 0.4);
 
         // Aplicação dos Decretos
@@ -190,64 +254,83 @@
 
         money += income;
 
-        // Penalidade se a energia for insuficiente
+        // Penalidade de Energia
         if (energyCap < energyDemand) {
-            happy = Math.max(0, happy - 4);
+            facCit = Math.max(0, facCit - 5);
         } else {
-            happy = Math.min(100, happy + 1);
+            facCit = Math.min(100, facCit + 1);
         }
 
-        // Evento Aleatório de Crise (15% de chance por mês)
-        if (!activeCrisis && Math.random() < 0.15 && month > 3) {
+        // ELEIÇÕES (A cada 12 meses)
+        if (month % 12 === 0) {
+            let avgHappy = Math.floor((facEco + facBiz + facCit) / 3);
+            if (avgHappy < 45) {
+                alert(`🚨 ELEIÇÕES DO MÊS ${month}: A sua aprovação foi de apenas ${avgHappy}%. Você foi derrotado nas urnas! O jogo será reiniciado.`);
+                location.reload();
+            } else {
+                alert(`🎉 ELEIÇÕES DO MÊS ${month}: Parabéns! Com ${avgHappy}% de aprovação, você foi reeleito para mais um mandato!`);
+            }
+        }
+
+        // VERIFICAR VITÓRIA DA MISSÃO
+        if (pollution <= 0 && energyCap >= energyDemand && month <= 24) {
+            alert(`🏆 VITÓRIA! Mês ${month}: Você cumpriu a Operação Transição Verde! A cidade atingiu 0% de poluição e 100% de sustentabilidade!`);
+        }
+
+        // Evento Aleatório de Crise (15% de chance)
+        if (!activeCrisis && Math.random() < 0.15 && month > 2) {
             activeCrisis = true;
             document.getElementById('crisis-box').style.display = 'block';
         }
 
         updateUI();
-    }, 4000);
+    }, 15000);
 
-    // MUDAR ABA
     function switchTab(tab) {
         document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        
         document.getElementById('tab-' + tab).classList.add('active');
         event.target.classList.add('active');
     }
 
-    // ATUALIZAR UI
     function updateUI() {
         let energyDemand = Math.floor(pop / 80);
+        let avgHappy = Math.floor((facEco + facBiz + facCit) / 3);
 
         document.getElementById('ui-date').innerText = 'Mês ' + month;
         document.getElementById('ui-money').innerText = '$' + money.toLocaleString();
         document.getElementById('ui-pop').innerText = pop.toLocaleString();
 
+        document.getElementById('fac-eco').innerText = facEco + '%';
+        document.getElementById('fac-biz').innerText = facBiz + '%';
+        document.getElementById('fac-cit').innerText = facCit + '%';
+
+        document.getElementById('ui-elec-countdown').innerText = (12 - (month % 12));
+
         document.getElementById('ui-energy-text').innerText = `${energyDemand} / ${energyCap} MW`;
         document.getElementById('bar-energy').style.width = Math.min(100, (energyDemand / energyCap) * 100) + '%';
         document.getElementById('bar-energy').style.background = energyDemand > energyCap ? '#ef4444' : '#38bdf8';
 
-        document.getElementById('ui-happy-text').innerText = happy + '%';
-        document.getElementById('bar-happy').style.width = happy + '%';
+        document.getElementById('ui-happy-text').innerText = avgHappy + '%';
+        document.getElementById('bar-happy').style.width = avgHappy + '%';
 
         document.getElementById('ui-pollution-text').innerText = pollution + '%';
         document.getElementById('bar-pollution').style.width = pollution + '%';
 
+        renderMap();
         renderBuildings();
         renderPolicies();
     }
 
-    // RENDERIZAR CONSTRUÇÕES
     function renderBuildings() {
         const list = document.getElementById('buildings-list');
         list.innerHTML = '';
-
         buildings.forEach(b => {
             const item = document.createElement('div');
             item.className = 'card-item';
             item.innerHTML = `
                 <div class="card-info">
-                    <h4>${b.name} (${b.bought})</h4>
+                    <h4>${b.icon} ${b.name} (${b.bought})</h4>
                     <p>${b.desc}</p>
                 </div>
                 <button class="btn-action" ${money < b.cost ? 'disabled' : ''} onclick="buyBuilding(${b.id})">
@@ -265,17 +348,15 @@
             b.bought++;
             if (b.cap) energyCap += b.cap;
             if (b.pol) pollution = Math.max(0, pollution + b.pol);
-            if (b.happy) happy = Math.min(100, happy + b.happy);
+            facEco = Math.min(100, facEco + 5);
             b.cost = Math.floor(b.cost * 1.3);
             updateUI();
         }
     }
 
-    // RENDERIZAR DECRETOS
     function renderPolicies() {
         const list = document.getElementById('policies-list');
         list.innerHTML = '';
-
         policies.forEach(p => {
             const item = document.createElement('div');
             item.className = 'card-item';
@@ -298,13 +379,13 @@
             p.active = !p.active;
             if (p.active) {
                 if (p.polEffect) pollution = Math.max(0, pollution + p.polEffect);
-                if (p.happyEffect) happy = Math.max(0, happy + p.happyEffect);
+                if (p.ecoEff) facEco = Math.min(100, facEco + p.ecoEff);
+                if (p.bizEff) facBiz = Math.max(0, facBiz + p.bizEff);
             }
             updateUI();
         }
     }
 
-    // QUIZ
     function renderQuiz() {
         const q = questions[currentQ];
         document.getElementById('q-text').innerText = (currentQ + 1) + ". " + q.q;
@@ -327,38 +408,27 @@
 
         if (idx === q.ans) {
             money += q.reward;
-            happy = Math.min(100, happy + 5);
+            if (q.ecoEff) facEco = Math.min(100, facEco + q.ecoEff);
+            if (q.bizEff) facBiz = Math.min(100, facBiz + q.bizEff);
+            if (q.citEff) facCit = Math.min(100, facCit + q.citEff);
+
             fb.style.background = 'rgba(16, 185, 129, 0.2)';
             fb.style.color = '#34d399';
-            fb.innerText = "Excelente decisão! +$" + q.reward + " e +5% de Aprovação!";
+            fb.innerText = "Excelente decisão! +$" + q.reward + " e melhoria no conselho!";
 
             if (activeCrisis) {
                 activeCrisis = false;
                 document.getElementById('crisis-box').style.display = 'none';
             }
         } else {
-            happy = Math.max(0, happy - 8);
+            facCit = Math.max(0, facCit - 8);
             fb.style.background = 'rgba(239, 68, 68, 0.2)';
             fb.style.color = '#f87171';
-            fb.innerText = "Decisão contestada pela população! Aprovação -8%";
+            fb.innerText = "Decisão contestada! A aprovação dos cidadãos caiu 8%.";
         }
 
         updateUI();
         currentQ = (currentQ + 1) % questions.length;
 
         setTimeout(() => {
-            fb.style.display = 'none';
-            renderQuiz();
-        }, 1500);
-    }
-
-    function resolveCrisis() {
-        switchTab('quiz');
-    }
-
-    // INICIALIZAÇÃO
-    updateUI();
-    renderQuiz();
-</script>
-</body>
-</html>
+            fb.style
