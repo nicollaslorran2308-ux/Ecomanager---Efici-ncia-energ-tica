@@ -29,6 +29,7 @@
         
         /* Quiz */
         .quiz-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
+        .quiz-category { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #facc15; margin-bottom: 4px; font-weight: bold; }
         .quiz-q { font-size: 13px; font-weight: bold; margin-bottom: 10px; min-height: 36px; }
         .opt-btn { width: 100%; text-align: left; padding: 10px; background: #334155; border: 1px solid #475569; color: white; border-radius: 6px; margin-bottom: 6px; font-size: 12px; cursor: pointer; }
         .opt-btn:hover { background: #475569; }
@@ -73,6 +74,7 @@
     <!-- Conteúdo 1: Quiz -->
     <div id="tab-quiz" class="tab-content active">
         <div class="quiz-box">
+            <div id="q-cat" class="quiz-category">Categoria: Dicas Práticas</div>
             <div id="q-text" class="quiz-q">Carregando...</div>
             <div id="q-options"></div>
             <div id="q-feedback" class="feedback"></div>
@@ -92,8 +94,8 @@
     let happiness = 50;
     let currentQ = 0;
 
-    // BANCO EXPANDIDO DE PERGUNTAS (15 Questões)
-    const questions = [
+    // 15 PERGUNTAS PRINCIPAIS (Práticas)
+    const mainQuestions = [
         { q: "Qual fonte de energia não emite gases de efeito estufa na geração?", opts: ["Carvão mineral", "Energia Solar", "Gás Natural"], ans: 1, reward: 200 },
         { q: "O que significa o modo 'Standby' nos aparelhos eletrônicos?", opts: ["Modo de economia total", "Consumo passivo de energia", "Aparelho 100% desligado"], ans: 1, reward: 150 },
         { q: "Qual o destino correto para o óleo de cozinha usado?", opts: ["Ralo da pia", "Lixo orgânico comum", "Postos de coleta para reciclagem"], ans: 2, reward: 200 },
@@ -110,6 +112,19 @@
         { q: "Por que devemos evitar o uso de plásticos descartáveis de uso único?", opts: ["Porque são muito caros", "Porque demoram centenas de anos para se decompor", "Porque não podem ser fabricados"], ans: 1, reward: 190 },
         { q: "O que é arquitetura bioclimática?", opts: ["Projetar construções aproveitando o clima local para economizar energia", "Pintar casas de verde", "Construir prédios apenas em florestas"], ans: 0, reward: 250 }
     ];
+
+    // 6 PERGUNTAS BÓNUS (Curiosidades para a vida)
+    const bonusQuestions = [
+        { q: "💡 Curiosidade: Qual é o país que mais produz energia solar e eólica no mundo atualmente?", opts: ["Estados Unidos", "China", "Alemanha"], ans: 1, reward: 350 },
+        { q: "💡 Curiosidade: Qual país da América do Sul gera quase 100% da sua eletricidade de fontes renováveis?", opts: ["Uruguai", "Argentina", "Chile"], ans: 0, reward: 350 },
+        { q: "💡 Curiosidade: Qual país europeu tem a Islândia como referência em energia limpa gerando energia do próprio calor da Terra?", opts: ["Energia Geotérmica", "Energia Nuclear", "Energia das Mareas"], ans: 0, reward: 350 },
+        { q: "💡 Curiosidade: Sabia que a maior usina hidrelétrica do mundo em produção de energia fica na fronteira de quais países?", opts: ["Brasil e Paraguai (Itaipu)", "China e Rússia", "EUA e Canadá"], ans: 0, reward: 350 },
+        { q: "💡 Curiosidade: Qual destas opções é o único país do mundo que recicla mais de 99% do seu próprio lixo doméstico?", opts: ["Suécia", "Japão", "Austrália"], ans: 0, reward: 350 },
+        { q: "💡 Curiosidade: Qual invenção transporte consome cerca de 4 a 5 vezes menos energia por passageiro do que um carro comum?", opts: ["Metrô / Trem urbano", "Avião comercial", "Helicóptero"], ans: 0, reward: 350 }
+    ];
+
+    // Lista unificada
+    let questions = [...mainQuestions, ...bonusQuestions];
 
     // MELHORIAS DA CIDADE
     const buildings = [
@@ -145,6 +160,16 @@
     // CARREGAR PERGUNTA
     function renderQuiz() {
         const q = questions[currentQ];
+        const catEl = document.getElementById('q-cat');
+
+        if (currentQ >= mainQuestions.length) {
+            catEl.innerText = "🌟 NÍVEL BÓNUS: Curiosidades para a Vida!";
+            catEl.style.color = "#facc15";
+        } else {
+            catEl.innerText = "Categoria: Dicas Práticas";
+            catEl.style.color = "#94a3b8";
+        }
+
         document.getElementById('q-text').innerText = (currentQ + 1) + ". " + q.q;
         const optsDiv = document.getElementById('q-options');
         optsDiv.innerHTML = "";
@@ -179,10 +204,9 @@
 
         updateUI();
 
-        // Avança para a próxima pergunta (em loop infinito)
+        // Avança em loop infinito pelas 21 perguntas
         currentQ = (currentQ + 1) % questions.length;
         
-        // Aguarda 1.5s antes de exibir a nova questão
         setTimeout(() => {
             fb.style.display = 'none';
             renderQuiz();
