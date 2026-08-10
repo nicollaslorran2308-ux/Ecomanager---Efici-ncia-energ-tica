@@ -10,14 +10,14 @@
         
         .app-card { background: #111827; border: 1px solid #1e293b; border-radius: 16px; max-width: 520px; width: 100%; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
-        .header { text-align: center; margin-bottom: 10px; }
+        .header { text-align: center; margin-bottom: 12px; }
         .header h1 { font-size: 22px; color: #10b981; }
         .header p { font-size: 11px; color: #64748b; }
 
         /* Mapa da Cidade */
-        .city-map-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: center; }
-        .city-map-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .city-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; font-size: 18px; line-height: 1.2; }
+        .city-map-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 15px; text-align: center; }
+        .city-map-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; font-weight: bold; }
+        .city-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; font-size: 20px; line-height: 1.2; justify-items: center; align-items: center; background: #1e293b; padding: 10px; border-radius: 8px; }
         
         /* Mission Banner */
         .mission-box { background: #1e1b4b; border: 1px solid #4338ca; border-radius: 10px; padding: 10px; margin-bottom: 15px; font-size: 11px; color: #c7d2fe; }
@@ -72,18 +72,18 @@
 <div class="app-card">
     <div class="header">
         <h1>🌆 EcoManager: Empire</h1>
-        <p>Edição Simulador Real com Eleições & Mapa Vivo</p>
+        <p>Simulador Urbano de Sustentabilidade</p>
     </div>
 
     <!-- Mapa Visual da Cidade -->
     <div class="city-map-card">
-        <div class="city-map-title">Visualização do Distrito Urbano</div>
+        <div class="city-map-title">Distrito Urbano em Tempo Real</div>
         <div id="city-grid" class="city-grid"></div>
     </div>
 
     <!-- Missão Ativa -->
     <div class="mission-box">
-        <div class="mission-title">🎯 Cenário Atual: Operação Transição Verde</div>
+        <div class="mission-title">🎯 Cenário: Operação Transição Verde</div>
         <div>Reduza a poluição para 0% e atinja 100% de Energia Limpa antes do Mês 24.</div>
     </div>
 
@@ -140,9 +140,9 @@
 
     <!-- Navegação -->
     <div class="tab-menu">
-        <button class="tab-btn active" onclick="switchTab('infra')">🏗️ Obras</button>
-        <button class="tab-btn" onclick="switchTab('policy')">📜 Decretos</button>
-        <button class="tab-btn" onclick="switchTab('quiz')">📋 Desafios</button>
+        <button class="tab-btn active" onclick="switchTab('infra', this)">🏗️ Obras</button>
+        <button class="tab-btn" onclick="switchTab('policy', this)">📜 Decretos</button>
+        <button class="tab-btn" onclick="switchTab('quiz', this)">📋 Desafios</button>
     </div>
 
     <!-- TAB 1: OBRAS -->
@@ -204,34 +204,45 @@
         { q: "💡 Curiosidade: Qual país utiliza a energia geotérmica aproveitando o calor dos vulcões?", opts: ["Islândia", "Japão", "Austrália"], ans: 0, reward: 450, ecoEff: 5 }
     ];
 
-    // MAPA VISUAL (Grid 6x3)
+    // SISTEMA DE TROCA DE ABAS CORRIGIDO
+    function switchTab(tab, btnElement) {
+        document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tab).classList.add('active');
+        if (btnElement) {
+            btnElement.classList.add('active');
+        }
+    }
+
+    // MAPA VISUAL RENDERIZADO
     function renderMap() {
         const grid = document.getElementById('city-grid');
         grid.innerHTML = '';
         
         let tiles = [];
-        // Preenche com base no status da cidade
         buildings.forEach(b => {
-            for(let i=0; i<b.bought; i++) tiles.push(b.icon);
+            for(let i = 0; i < b.bought; i++) {
+                tiles.push(b.icon);
+            }
         });
 
-        // Preenche o restante com fábrica (se poluído) ou parque (se limpo)
-        while(tiles.length < 18) {
+        while(tiles.length < 12) {
             if(pollution > 20) {
                 tiles.push(Math.random() > 0.5 ? '🏭' : '🏢');
             } else {
-                tiles.push(Math.random() > 0.5 ? '🌳' : '🏢');
+                tiles.push(Math.random() > 0.5 ? '🌳' : '🏡');
             }
         }
 
-        tiles.slice(0, 18).forEach(icon => {
+        tiles.slice(0, 12).forEach(icon => {
             const span = document.createElement('span');
             span.innerText = icon;
             grid.appendChild(span);
         });
     }
 
-    // LOOP TEMPORAL (15 segundos = 1 Mês)
+    // LOOP TEMPORAL (A cada 15 segundos = 1 Mês)
     setInterval(() => {
         month++;
         
@@ -239,7 +250,6 @@
         let energyDemand = Math.floor(pop / 80);
         let income = Math.floor(pop * 0.4);
 
-        // Aplicação dos Decretos
         policies.forEach(p => {
             if (p.active) {
                 if (p.costPerMonth) income -= p.costPerMonth;
@@ -247,14 +257,12 @@
             }
         });
 
-        // Rendimento de prédios
         buildings.forEach(b => {
             if (b.income) income += (b.income * b.bought);
         });
 
         money += income;
 
-        // Penalidade de Energia
         if (energyCap < energyDemand) {
             facCit = Math.max(0, facCit - 5);
         } else {
@@ -265,19 +273,19 @@
         if (month % 12 === 0) {
             let avgHappy = Math.floor((facEco + facBiz + facCit) / 3);
             if (avgHappy < 45) {
-                alert(`🚨 ELEIÇÕES DO MÊS ${month}: A sua aprovação foi de apenas ${avgHappy}%. Você foi derrotado nas urnas! O jogo será reiniciado.`);
+                alert(`🚨 ELEIÇÕES DO MÊS ${month}: Sua aprovação foi de apenas ${avgHappy}%. Você foi derrotado nas urnas! Reiniciando a gestão...`);
                 location.reload();
             } else {
                 alert(`🎉 ELEIÇÕES DO MÊS ${month}: Parabéns! Com ${avgHappy}% de aprovação, você foi reeleito para mais um mandato!`);
             }
         }
 
-        // VERIFICAR VITÓRIA DA MISSÃO
+        // CONDICIONAL DE VITÓRIA
         if (pollution <= 0 && energyCap >= energyDemand && month <= 24) {
-            alert(`🏆 VITÓRIA! Mês ${month}: Você cumpriu a Operação Transição Verde! A cidade atingiu 0% de poluição e 100% de sustentabilidade!`);
+            alert(`🏆 VITÓRIA NO MÊS ${month}! Você cumpriu a Operação Transição Verde com sucesso!`);
         }
 
-        // Evento Aleatório de Crise (15% de chance)
+        // EVENTO DE CRISE (15% de chance)
         if (!activeCrisis && Math.random() < 0.15 && month > 2) {
             activeCrisis = true;
             document.getElementById('crisis-box').style.display = 'block';
@@ -285,13 +293,6 @@
 
         updateUI();
     }, 15000);
-
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        event.target.classList.add('active');
-    }
 
     function updateUI() {
         let energyDemand = Math.floor(pop / 80);
@@ -305,7 +306,8 @@
         document.getElementById('fac-biz').innerText = facBiz + '%';
         document.getElementById('fac-cit').innerText = facCit + '%';
 
-        document.getElementById('ui-elec-countdown').innerText = (12 - (month % 12));
+        let nextElec = 12 - (month % 12);
+        document.getElementById('ui-elec-countdown').innerText = nextElec === 0 ? 12 : nextElec;
 
         document.getElementById('ui-energy-text').innerText = `${energyDemand} / ${energyCap} MW`;
         document.getElementById('bar-energy').style.width = Math.min(100, (energyDemand / energyCap) * 100) + '%';
@@ -430,5 +432,4 @@
         updateUI();
         currentQ = (currentQ + 1) % questions.length;
 
-        setTimeout(() => {
-            fb.style
+        setTimeout(
