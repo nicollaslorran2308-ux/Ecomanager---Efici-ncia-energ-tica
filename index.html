@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoManager: Empire Deluxe</title>
+    <title>EcoManager: Empire</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: #0b0f19; color: #f1f5f9; min-height: 100vh; padding: 15px; display: flex; justify-content: center; }
         
-        .app-card { background: #111827; border: 1px solid #1e293b; border-radius: 16px; max-width: 520px; width: 100%; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .app-card { background: #111827; border: 1px solid #1e293b; border-radius: 16px; max-width: 520px; width: 100%; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin: auto; position: relative; }
         
         .header { text-align: center; margin-bottom: 12px; }
         .header h1 { font-size: 22px; color: #10b981; }
@@ -33,7 +33,7 @@
         .status-bar-container { background: #1e293b; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 11px; border: 1px solid #334155; }
         .bar-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .progress-bg { background: #0f172a; border-radius: 4px; height: 6px; width: 100%; overflow: hidden; margin-bottom: 8px; }
-        .progress-fill { height: 100%; transition: width 0.3s; }
+        .progress-fill { height: 100%; transition: width 0.3s linear, background-color 0.3s; }
 
         /* Factions Bar */
         .factions-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; font-size: 10px; background: #0f172a; padding: 8px; border-radius: 8px; border: 1px solid #334155; }
@@ -44,14 +44,12 @@
         .tab-btn { flex: 1; padding: 8px 4px; background: transparent; border: none; color: #94a3b8; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; }
         .tab-btn.active { background: #10b981; color: #fff; }
 
-        .tab-view { display: none; }
-        .tab-view.active { display: block; }
-
         /* Items / Upgrades */
         .card-item { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .card-info h4 { font-size: 12px; color: #38bdf8; }
-        .card-info p { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-        .btn-action { background: #10b981; border: none; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .card-info h4 { font-size: 12px; color: #38bdf8; margin-bottom: 2px; }
+        .card-info p { font-size: 10px; color: #94a3b8; }
+        .btn-action { background: #10b981; border: none; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.1s; }
+        .btn-action:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
         .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
 
         /* Crise Box */
@@ -61,22 +59,35 @@
 
         /* Quiz UI */
         .quiz-category { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #facc15; margin-bottom: 4px; font-weight: bold; }
-        .quiz-q { font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-        .quiz-opt { width: 100%; text-align: left; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 6px; margin-bottom: 6px; font-size: 11px; cursor: pointer; }
+        .quiz-q { font-size: 13px; font-weight: bold; margin-bottom: 12px; line-height: 1.4; }
+        .quiz-opt { width: 100%; text-align: left; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 6px; margin-bottom: 6px; font-size: 11px; cursor: pointer; transition: 0.1s; }
         .quiz-opt:hover { background: #334155; }
-        .feedback { font-size: 11px; padding: 8px; border-radius: 6px; margin-top: 8px; text-align: center; font-weight: bold; display: none; }
+        .feedback { font-size: 11px; padding: 10px; border-radius: 6px; margin-top: 8px; text-align: center; font-weight: bold; display: none; }
 
         /* Conquistas */
-        .achieve-item { background: #0f172a; border: 1px solid #334155; padding: 8px; border-radius: 8px; margin-bottom: 6px; font-size: 11px; display: flex; align-items: center; justify-content: space-between; }
+        .achieve-item { background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 8px; margin-bottom: 6px; font-size: 11px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
         .achieve-item.unlocked { border-color: #10b981; background: #064e3b; }
+
+        /* Modal Base */
+        #game-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; border: 2px solid #3b82f6; max-width: 400px; width: 100%; text-align: center; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        #modal-text { margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
+<!-- Sistema de Modal Blindado -->
+<div id="game-modal">
+    <div class="modal-content">
+        <div id="modal-text"></div>
+        <button id="modal-btn" class="btn-action" style="background:#3b82f6; width:100%; padding: 12px; font-size:13px;">Continuar</button>
+    </div>
+</div>
+
 <div class="app-card">
     <div class="header">
         <h1>🌆 EcoManager: Empire</h1>
-        <p>Simulador Urbano de Sustentabilidade</p>
+        <p>Edição Simulador Urbano de Sustentabilidade</p>
     </div>
 
     <!-- Mapa Visual da Cidade -->
@@ -98,11 +109,16 @@
         <button class="btn-action" style="background:#f97316; width:100%" onclick="resolveCrisis()">Resolver Crise (Acesse o Quiz)</button>
     </div>
 
-    <!-- Dash Stats -->
+    <!-- Dash Stats (Com Barra de Progresso de Tempo Atualizada para 30s) -->
     <div class="dash-grid">
-        <div class="stat-box">
-            <div class="stat-title">Tempo de Jogo</div>
-            <div id="ui-date" class="stat-val" style="color:#a855f7">Mês 1</div>
+        <div class="stat-box" style="grid-column: span 3; text-align: left;">
+            <div class="stat-title" style="display: flex; justify-content: space-between;">
+                <span>Progresso do <span id="ui-date">Mês 1</span></span>
+                <span style="color:#a855f7;">⏳ 30s</span>
+            </div>
+            <div class="progress-bg" style="margin-top: 6px; margin-bottom: 0;">
+                <div id="bar-month-timer" class="progress-fill" style="background:#a855f7; width: 0%;"></div>
+            </div>
         </div>
         <div class="stat-box">
             <div class="stat-title">Tesouro</div>
@@ -111,6 +127,10 @@
         <div class="stat-box">
             <div class="stat-title">População</div>
             <div id="ui-pop" class="stat-val" style="color:#38bdf8">1,000</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-title">Energia</div>
+            <div id="ui-cap" class="stat-val" style="color:#4ade80">10 MW</div>
         </div>
     </div>
 
@@ -144,24 +164,26 @@
 
     <!-- Navegação por Abas -->
     <div class="tab-menu">
-        <button class="tab-btn active" onclick="switchTab('infra', this)">🏗️ Obras</button>
-        <button class="tab-btn" onclick="switchTab('policy', this)">📜 Decretos</button>
-        <button class="tab-btn" onclick="switchTab('quiz', this)">📋 Desafios</button>
-        <button class="tab-btn" onclick="switchTab('achieve', this)">🏆 Feitos</button>
+        <button id="btn-tab-infra" class="tab-btn active" onclick="switchTab('infra', this)">🏗️ Obras</button>
+        <button id="btn-tab-policy" class="tab-btn" onclick="switchTab('policy', this)">📜 Decretos</button>
+        <button id="btn-tab-quiz" class="tab-btn" onclick="switchTab('quiz', this)">📋 Desafios</button>
+        <button id="btn-tab-achieve" class="tab-btn" onclick="switchTab('achieve', this)">🏆 Feitos</button>
     </div>
 
+    <!-- CONTEÚDO DAS ABAS -->
+    
     <!-- TAB 1: OBRAS -->
-    <div id="tab-infra" class="tab-view active">
+    <div id="tab-infra" class="tab-view" style="display: block;">
         <div id="buildings-list"></div>
     </div>
 
     <!-- TAB 2: DECRETOS -->
-    <div id="tab-policy" class="tab-view">
+    <div id="tab-policy" class="tab-view" style="display: none;">
         <div id="policies-list"></div>
     </div>
 
     <!-- TAB 3: QUIZ (10 Perguntas + 6 Bônus) -->
-    <div id="tab-quiz" class="tab-view">
+    <div id="tab-quiz" class="tab-view" style="display: none;">
         <div id="q-cat" class="quiz-category">Categoria: Gestão Urbana</div>
         <div class="quiz-q" id="q-text">Carregando pergunta...</div>
         <div id="q-options"></div>
@@ -169,193 +191,134 @@
     </div>
 
     <!-- TAB 4: CONQUISTAS -->
-    <div id="tab-achieve" class="tab-view">
+    <div id="tab-achieve" class="tab-view" style="display: none;">
         <div id="achievements-list"></div>
     </div>
 </div>
 
 <script>
-    // ESTADO DO JOGO
-    let month = 1;
-    let money = 1000;
-    let pop = 1000;
-    let pollution = 35;
-    let energyCap = 10;
-    let activeCrisis = false;
-    let currentQ = 0;
+// ==========================================
+// LÓGICA DO JOGO - TEMPO AJUSTADO PARA 30s
+// ==========================================
+window.onload = () => {
+    try {
+        // ESTADO DO JOGO
+        let month = 1;
+        let tickSeconds = 0;
+        const monthDuration = 30; // 30 Segundos por mês
 
-    // FACÇÕES (3 Facções)
-    let facEco = 60;
-    let facBiz = 60;
-    let facCit = 70;
+        let money = 1000;
+        let pop = 1000;
+        let pollution = 35;
+        let energyCap = 10;
+        let activeCrisis = false;
+        let currentQ = 0;
+        let gameActive = true;
 
-    // CONSTRUÇÕES
-    const buildings = [
-        { id: 1, name: "Parque Solar Comunitário", desc: "+15 MW Limpa, -5% Poluição", cost: 400, cap: 15, pol: -5, icon: '☀️', bought: 0 },
-        { id: 2, name: "Usina Eólica Off-shore", desc: "+40 MW Limpa, -10% Poluição", cost: 950, cap: 40, pol: -10, icon: '💨', bought: 0 },
-        { id: 3, name: "Centro de Reciclagem Avançado", desc: "-15% Poluição, +$150/mês", cost: 600, cap: 0, pol: -15, income: 150, icon: '♻️', bought: 0 },
-        { id: 4, name: "Rede de Metrô Elétrico", desc: "+15% Cidadãos, -10% Poluição", cost: 1200, cap: 0, pol: -10, icon: '🚆', bought: 0 }
-    ];
+        // FACÇÕES
+        let facEco = 60;
+        let facBiz = 60;
+        let facCit = 70;
 
-    // DECRETOS POLÍTICOS
-    const policies = [
-        { id: 1, name: "Subvenção a Veículos Elétricos", desc: "-10% Poluição, +10% Eco, Custa $50/mês", active: false, costPerMonth: 50, polEffect: -10, ecoEff: 10, bizEff: -5 },
-        { id: 2, name: "Proibição de Plásticos Descartáveis", desc: "-5% Poluição, +10% Eco, -10% Empresários", active: false, costPerMonth: 0, polEffect: -5, ecoEff: 10, bizEff: -10 },
-        { id: 3, name: "Taxa sobre Indústrias Poluentes", desc: "+$200/mês, -15% Empresários, +5% Eco", active: false, incomePerMonth: 200, bizEff: -15, ecoEff: 5 }
-    ];
+        // CONSTRUÇÕES
+        const buildings = [
+            { id: 1, name: "Parque Solar Comunitário", desc: "+15 MW Limpa, -5% Poluição", cost: 400, cap: 15, pol: -5, icon: '☀️', bought: 0 },
+            { id: 2, name: "Usina Eólica Off-shore", desc: "+40 MW Limpa, -10% Poluição", cost: 950, cap: 40, pol: -10, icon: '💨', bought: 0 },
+            { id: 3, name: "Centro de Reciclagem Avançado", desc: "-15% Poluição, +$150/mês", cost: 600, cap: 0, pol: -15, income: 150, icon: '♻️', bought: 0 },
+            { id: 4, name: "Rede de Metrô Elétrico", desc: "+15% Cidadãos, -10% Poluição", cost: 1200, cap: 0, pol: -10, icon: '🚆', bought: 0 }
+        ];
 
-    // 10 PERGUNTAS + 6 BÔNUS
-    const questions = [
-        // 10 Perguntas Principais
-        { cat: "Gestão Urbana", q: "Sua cidade sofre com ilhas de calor. Qual a melhor solução urbanística?", opts: ["Pintar o asfalto de preto", "Criar telhados verdes e plantar árvores", "Instalar mais ar-condicionados"], ans: 1, reward: 300, ecoEff: 10 },
-        { cat: "Gestão Urbana", q: "Uma fábrica quer instalar-se prometendo empregos, mas poluindo o rio. O que fazer?", opts: ["Exigir tratamento de efluentes 100% limpo", "Aceitar sem restrições", "Proibir qualquer indústria"], ans: 0, reward: 350, bizEff: 5, ecoEff: 5 },
-        { cat: "Sustentabilidade", q: "Qual a melhor estratégia para lidar com o aumento do lixo eletrônico?", opts: ["Jogar no aterro comum", "Criar pontos de logística reversa e coleta seletiva", "Incinerar tudo"], ans: 1, reward: 300, ecoEff: 8 },
-        { cat: "Mobilidade", q: "Para reduzir as emissões do transporte, qual a prioridade de investimento?", opts: ["Aumentar faixas para carros", "Investir em transporte público elétrico e ciclovias", "Reduzir preço da gasolina"], ans: 1, reward: 400, citEff: 10 },
-        { cat: "Economia Circular", q: "Como incentivar as empresas a reutilizarem seus próprios resíduos?", opts: ["Dar isenção fiscal para matérias-primas recicladas", "Aumentar imposto da água", "Ignorar a produção de lixo"], ans: 0, reward: 300, bizEff: 8, ecoEff: 5 },
-        { cat: "Recursos Hídricos", q: "A cidade enfrenta escassez de água. Qual a ação mais sustentável?", opts: ["Construir poços sem controle", "Implementar redes de reúso de água de chuva", "Racionar água apenas à noite"], ans: 1, reward: 350, ecoEff: 10 },
-        { cat: "Energia", q: "Como lidar com os picos de consumo elétrico nos horários de pico?", opts: ["Instalar redes de baterias e redes inteligentes (Smart Grids)", "Desligar a energia dos bairros", "Queimar mais carvão mineral"], ans: 0, reward: 400, ecoEff: 10 },
-        { cat: "Planejamento", q: "Como evitar que novas construções fiquem em áreas de risco ambientais?", opts: ["Atualizar o plano diretor restringindo áreas de preservação", "Deixar os moradores escolherem livremente", "Cobrar taxas mais baratas"], ans: 0, reward: 300, ecoEff: 7, citEff: 5 },
-        { cat: "Agricultura Urbana", q: "Qual o benefício de apoiar hortas comunitárias na cidade?", opts: ["Gera poeira", "Aumenta a segurança alimentar e reduz emissões de transporte", "Consome espaço de prédios"], ans: 1, reward: 250, citEff: 8, ecoEff: 5 },
-        { cat: "Sustentabilidade", q: "O que é o conceito de 'Lixo Zero' em uma gestão pública?", opts: ["Queimar 100% dos resíduos", "Desviar resíduos dos aterros através de compostagem e reciclagem", "Não permitir compras na cidade"], ans: 1, reward: 350, ecoEff: 10 },
+        // DECRETOS POLÍTICOS
+        const policies = [
+            { id: 1, name: "Subvenção a Veículos Elétricos", desc: "-10% Poluição, +10% Eco, Custa $50/mês", active: false, costPerMonth: 50, polEffect: -10, ecoEff: 10, bizEff: -5 },
+            { id: 2, name: "Proibição de Plásticos Descartáveis", desc: "-5% Poluição, +10% Eco, -10% Empresários", active: false, costPerMonth: 0, polEffect: -5, ecoEff: 10, bizEff: -10 },
+            { id: 3, name: "Taxa sobre Indústrias Poluentes", desc: "+$200/mês, -15% Empresários, +5% Eco", active: false, incomePerMonth: 200, bizEff: -15, ecoEff: 5 }
+        ];
 
-        // 6 Perguntas Bônus (Curiosidades & Fatos)
-        { cat: "💡 Curiosidade Bônus", q: "Qual é o país que mais produz energia solar e eólica no mundo?", opts: ["Estados Unidos", "China", "Alemanha"], ans: 1, reward: 450, ecoEff: 5 },
-        { cat: "💡 Curiosidade Bônus", q: "Qual país utiliza a energia geotérmica aproveitando o calor dos vulcões para quase 100% do seu aquecimento?", opts: ["Islândia", "Japão", "Austrália"], ans: 0, reward: 450, ecoEff: 5 },
-        { cat: "💡 Curiosidade Bônus", q: "O que é o 'Efeito Estufa' em sua definição natural básica?", opts: ["Um fenômeno exclusivamente prejudicial", "Um processo natural que mantém a Terra aquecida e habitável", "Uma invenção da tecnologia moderna"], ans: 1, reward: 450, ecoEff: 5 },
-        { cat: "💡 Curiosidade Bônus", q: "Qual matriz energética limpa utiliza a força do movimento das marés dos oceanos?", opts: ["Energia Maremotriz", "Energia Biomassa", "Energia Nuclear"], ans: 0, reward: 450, ecoEff: 5 },
-        { cat: "💡 Curiosidade Bônus", q: "Qual cidade brasileira é mundialmente reconhecida pelo seu sistema pioneiro de transporte por ônibus rápido (BRT)?", opts: ["São Paulo", "Curitiba", "Rio de Janeiro"], ans: 1, reward: 450, citEff: 5 },
-        { cat: "💡 Curiosidade Bônus", q: "O que significa a sigla ESG, utilizada por empresas sustentáveis?", opts: ["Energy, Solar & Gas", "Environmental, Social, and Governance", "Eco, Safety & Growth"], ans: 1, reward: 450, bizEff: 5 }
-    ];
+        // 16 PERGUNTAS (10 Principais + 6 Bônus)
+        const questions = [
+            { cat: "Gestão Urbana", q: "Sua cidade sofre com ilhas de calor. Qual a melhor solução urbanística?", opts: ["Pintar o asfalto de preto", "Criar telhados verdes e plantar árvores", "Instalar mais ar-condicionados"], ans: 1, reward: 300, ecoEff: 10 },
+            { cat: "Gestão Urbana", q: "Uma fábrica quer instalar-se prometendo empregos, mas poluindo o rio. O que fazer?", opts: ["Exigir tratamento de efluentes 100% limpo", "Aceitar sem restrições", "Proibir qualquer indústria"], ans: 0, reward: 350, bizEff: 5, ecoEff: 5 },
+            { cat: "Sustentabilidade", q: "Qual a melhor estratégia para lidar com o aumento do lixo eletrônico?", opts: ["Jogar no aterro comum", "Criar pontos de logística reversa e coleta seletiva", "Incinerar tudo"], ans: 1, reward: 300, ecoEff: 8 },
+            { cat: "Mobilidade", q: "Para reduzir as emissões do transporte, qual a prioridade de investimento?", opts: ["Aumentar faixas para carros", "Investir em transporte público elétrico e ciclovias", "Reduzir preço da gasolina"], ans: 1, reward: 400, citEff: 10 },
+            { cat: "Economia Circular", q: "Como incentivar as empresas a reutilizarem seus próprios resíduos?", opts: ["Dar isenção fiscal para matérias-primas recicladas", "Aumentar imposto da água", "Ignorar a produção de lixo"], ans: 0, reward: 300, bizEff: 8, ecoEff: 5 },
+            { cat: "Recursos Hídricos", q: "A cidade enfrenta escassez de água. Qual a ação mais sustentável?", opts: ["Construir poços sem controle", "Implementar redes de reúso de água de chuva", "Racionar água apenas à noite"], ans: 1, reward: 350, ecoEff: 10 },
+            { cat: "Energia", q: "Como lidar com os picos de consumo elétrico nos horários de pico?", opts: ["Instalar redes de baterias e redes inteligentes (Smart Grids)", "Desligar a energia dos bairros", "Queimar mais carvão mineral"], ans: 0, reward: 400, ecoEff: 10 },
+            { cat: "Planejamento", q: "Como evitar que novas construções fiquem em áreas de risco ambientais?", opts: ["Atualizar o plano diretor restringindo áreas de preservação", "Deixar os moradores escolherem livremente", "Cobrar taxas mais baratas"], ans: 0, reward: 300, ecoEff: 7, citEff: 5 },
+            { cat: "Agricultura Urbana", q: "Qual o benefício de apoiar hortas comunitárias na cidade?", opts: ["Gera poeira", "Aumenta a segurança alimentar e reduz emissões de transporte", "Consome espaço de prédios"], ans: 1, reward: 250, citEff: 8, ecoEff: 5 },
+            { cat: "Sustentabilidade", q: "O que é o conceito de 'Lixo Zero' em uma gestão pública?", opts: ["Queimar 100% dos resíduos", "Desviar resíduos dos aterros através de compostagem e reciclagem", "Não permitir compras na cidade"], ans: 1, reward: 350, ecoEff: 10 },
+            { cat: "💡 Curiosidade Bônus", q: "Qual é o país que mais produz energia solar e eólica no mundo?", opts: ["Estados Unidos", "China", "Alemanha"], ans: 1, reward: 450, ecoEff: 5 },
+            { cat: "💡 Curiosidade Bônus", q: "Qual país utiliza a energia geotérmica aproveitando o calor dos vulcões para quase 100% do seu aquecimento?", opts: ["Islândia", "Japão", "Austrália"], ans: 0, reward: 450, ecoEff: 5 },
+            { cat: "💡 Curiosidade Bônus", q: "O que é o 'Efeito Estufa' em sua definição natural básica?", opts: ["Um fenômeno exclusivamente prejudicial", "Um processo natural que mantém a Terra aquecida e habitável", "Uma invenção da tecnologia moderna"], ans: 1, reward: 450, ecoEff: 5 },
+            { cat: "💡 Curiosidade Bônus", q: "Qual matriz energética limpa utiliza a força do movimento das marés dos oceanos?", opts: ["Energia Maremotriz", "Energia Biomassa", "Energia Nuclear"], ans: 0, reward: 450, ecoEff: 5 },
+            { cat: "💡 Curiosidade Bônus", q: "Qual cidade brasileira é mundialmente reconhecida pelo seu sistema pioneiro de transporte por ônibus rápido (BRT)?", opts: ["São Paulo", "Curitiba", "Rio de Janeiro"], ans: 1, reward: 450, citEff: 5 },
+            { cat: "💡 Curiosidade Bônus", q: "O que significa a sigla ESG, utilizada por empresas sustentáveis?", opts: ["Energy, Solar & Gas", "Environmental, Social, and Governance", "Eco, Safety & Growth"], ans: 1, reward: 450, bizEff: 5 }
+        ];
 
-    // CONQUISTAS
-    const achievements = [
-        { id: 1, name: "Primeiro Tijolo Verde", desc: "Construa sua primeira obra sustentável.", done: false },
-        { id: 2, name: "Energia Plena", desc: "Supra toda a demanda de energia da cidade.", done: false },
-        { id: 3, name: "Cidade Espelho", desc: "Reduza a poluição da cidade para 0%.", done: false },
-        { id: 4, name: "Reeleito com Louvor", desc: "Vença a primeira eleição municipal no Mês 12.", done: false }
-    ];
+        // CONQUISTAS
+        const achievements = [
+            { id: 1, name: "Primeiro Tijolo Verde", desc: "Construa sua primeira obra sustentável.", done: false },
+            { id: 2, name: "Energia Plena", desc: "Supra toda a demanda de energia da cidade.", done: false },
+            { id: 3, name: "Cidade Espelho", desc: "Reduza a poluição da cidade para 0%.", done: false },
+            { id: 4, name: "Reeleito com Louvor", desc: "Vença a primeira eleição municipal (Mês 12).", done: false },
+            { id: 5, name: "Operação Concluída", desc: "Vença o cenário principal antes do Mês 24.", done: false }
+        ];
 
-    // NAVEGAÇÃO DE ABAS
-    function switchTab(tab, btnElement) {
-        document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById('tab-' + tab).classList.add('active');
-        if (btnElement) {
-            btnElement.classList.add('active');
-        }
-    }
+        // ==========================================
+        // FUNÇÕES GLOBAIS DE INTERFACE
+        // ==========================================
 
-    // MAPA VISUAL RENDERIZADO
-    function renderMap() {
-        const grid = document.getElementById('city-grid');
-        grid.innerHTML = '';
-        
-        let tiles = [];
-        buildings.forEach(b => {
-            for(let i = 0; i < b.bought; i++) {
-                tiles.push(b.icon);
+        window.showModal = function(text, callback = null) {
+            const modal = document.getElementById('game-modal');
+            const textEl = document.getElementById('modal-text');
+            const btn = document.getElementById('modal-btn');
+            
+            textEl.innerHTML = text;
+            modal.style.display = 'flex';
+            
+            btn.onclick = () => {
+                modal.style.display = 'none';
+                if (callback) callback();
+            };
+        };
+
+        window.switchTab = function(tab, btn) {
+            document.querySelectorAll('.tab-view').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            const targetView = document.getElementById('tab-' + tab);
+            if (targetView) targetView.style.display = 'block';
+            if (btn) btn.classList.add('active');
+        };
+
+        window.resolveCrisis = function() {
+            const quizBtn = document.getElementById('btn-tab-quiz');
+            window.switchTab('quiz', quizBtn);
+        };
+
+        // ==========================================
+        // RENDERIZAÇÃO
+        // ==========================================
+
+        function renderMap() {
+            const grid = document.getElementById('city-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            let tiles = [];
+            buildings.forEach(b => {
+                for(let i = 0; i < b.bought; i++) tiles.push(b.icon);
+            });
+
+            while(tiles.length < 12) {
+                if(pollution > 20) {
+                    tiles.push('🏭');
+                } else {
+                    tiles.push('🌳');
+                }
             }
-        });
 
-        while(tiles.length < 12) {
-            if(pollution > 20) {
-                tiles.push(Math.random() > 0.5 ? '🏭' : '🏢');
-            } else {
-                tiles.push(Math.random() > 0.5 ? '🌳' : '🏡');
-            }
-        }
-
-        tiles.slice(0, 12).forEach(icon => {
-            const span = document.createElement('span');
-            span.innerText = icon;
-            grid.appendChild(span);
-        });
-    }
-
-    // LOOP TEMPORAL DE 15 SEGUNDOS = 1 MÊS
-    setInterval(() => {
-        month++;
-        
-        pop += Math.floor(pop * 0.02);
-        let energyDemand = Math.floor(pop / 80);
-        let income = Math.floor(pop * 0.4);
-
-        policies.forEach(p => {
-            if (p.active) {
-                if (p.costPerMonth) income -= p.costPerMonth;
-                if (p.incomePerMonth) income += p.incomePerMonth;
-            }
-        });
-
-        buildings.forEach(b => {
-            if (b.income) income += (b.income * b.bought);
-        });
-
-        money += income;
-
-        if (energyCap < energyDemand) {
-            facCit = Math.max(0, facCit - 5);
-        } else {
-            facCit = Math.min(100, facCit + 1);
-            checkAchieve(2);
-        }
-
-        if (pollution <= 0) {
-            checkAchieve(3);
-        }
-
-        // SISTEMA DE ELEIÇÕES (A cada 12 Meses)
-        if (month % 12 === 0) {
-            let avgHappy = Math.floor((facEco + facBiz + facCit) / 3);
-            if (avgHappy < 45) {
-                alert(`🚨 ELEIÇÕES (Mês ${month}): Sua aprovação média foi de apenas ${avgHappy}%. Você foi derrotado nas urnas! Reiniciando a gestão...`);
-                location.reload();
-            } else {
-                alert(`🎉 ELEIÇÕES (Mês ${month}): Com ${avgHappy}% de aprovação das facções, você foi reeleito para mais um mandato!`);
-                checkAchieve(4);
-            }
-        }
-
-        // VITÓRIA DO CENÁRIO
-        if (pollution <= 0 && energyCap >= energyDemand && month <= 24) {
-            alert(`🏆 VITÓRIA NO MÊS ${month}! Você concluiu a Operação Transição Verde com absoluto sucesso!`);
-        }
-
-        // EVENTO DE CRISE (15% de chance)
-        if (!activeCrisis && Math.random() < 0.15 && month > 2) {
-            activeCrisis = true;
-            document.getElementById('crisis-box').style.display = 'block';
-        }
-
-        updateUI();
-    }, 15000); // 15 Segundos
-
-    function checkAchieve(id) {
-        const ach = achievements.find(a => a.id === id);
-        if (ach && !ach.done) {
-            ach.done = true;
-            renderAchievements();
-        }
-    }
-
-    function updateUI() {
-        let energyDemand = Math.floor(pop / 80);
-        let avgHappy = Math.floor((facEco + facBiz + facCit) / 3);
-
-        document.getElementById('ui-date').innerText = 'Mês ' + month;
-        document.getElementById('ui-money').innerText = '$' + money.toLocaleString();
-        document.getElementById('ui-pop').innerText = pop.toLocaleString();
-
-        document.getElementById('fac-eco').innerText = facEco + '%';
-        document.getElementById('fac-biz').innerText = facBiz + '%';
-        document.getElementById('fac-cit').innerText = facCit + '%';
-
-        let nextElec = 12 - (month % 12);
-        document.getElementById('ui-elec-countdown').innerText = nextElec === 0 ? 12 : nextElec;
-
-        document.getElementById('ui-energy-text').innerText = `${energyDemand} / ${energyCap} MW`;
-        document.getElementById('bar-energy').style.width = Math.min(100, (energyDemand / energyCap) * 100) + '%';
-        document.getElementById('bar-energy').style.background = energyDemand > energyCap ? '#ef4444' : '#38bdf8';
-
-        document.getElementById('u
+            tiles.slice(0, 12).forEach(icon => {
+                const span = document.createElement('span');
+                span.innerText = icon;
+                grid.appendChild(span
